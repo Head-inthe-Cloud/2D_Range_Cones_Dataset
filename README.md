@@ -11,6 +11,10 @@
 	`$ cmake ..`
 	`$ make`
 	`$ sudo make install`
+- Install Dependencies
+	`$ cd YDLidar-SDK`
+	`$ pip install .` or `$ python setup.py build` + `$ python setup.py install`
+	`$ pip install matplotlib`
 - Open YDLidar-SDK/python/examples/plot_tof_test.py and change line 26 to this:
 	`laser.setlidaropt(ydlidar.LidarPropSerialBaudrate, 128000)`
 - Run
