@@ -22,3 +22,9 @@
 `$ python plot_tof_test.py`
 - Your lidar should run and you can see a map on your screen
 - Click the map and press 'q' to stop operation
+
+# Getting .csv as result
+- Download tof_test.py from this repo and replace the file in YDLidar-SDK/python/examples/
+- run `python tof_test.py`
+- Data will be stored in lidar_data.csv under the same folder
+- See line 26 ~ 51 for the codes that output data to the file
