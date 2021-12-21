@@ -5,6 +5,7 @@ import sys
 import csv
 # from plot import plot
 
+DATA_NAME = 'data/12202021/lidar_data_noisy_1m_2.csv'
 if __name__ == "__main__":
     ydlidar.os_init();
     ports = ydlidar.lidarPortList();
@@ -25,7 +26,7 @@ if __name__ == "__main__":
         ret = laser.turnOn();
         scan = ydlidar.LaserScan()
         # This opens the data file, or creates a new one if there isn't one
-        f = open('data/12052021/lidar_data_10m.csv', 'w', newline='')
+        f = open(DATA_NAME, 'w', newline='')
         writer = csv.writer(f)
         # Headers for data
         writer.writerow(['time_stamp', 'angle', 'range', 'intensity'])
@@ -48,7 +49,7 @@ if __name__ == "__main__":
                 print("Failed to get Lidar Data.")
             time.sleep(0.05);
         '''
-        for i in range(50):
+        for i in range(100):
             r = laser.doProcessSimple(scan);
             if r:
                 angle = []

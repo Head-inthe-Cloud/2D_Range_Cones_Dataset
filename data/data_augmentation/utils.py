@@ -1,21 +1,16 @@
-import os
-import ydlidar
-import sys
-from matplotlib.patches import Arc
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-import numpy as np
 import csv
 
 RMAX = 32.0
-NUM_SHOW = 2   # how many data in the file do you wish to see?
+NUM_SHOW = 1   # how many data in the file do you wish to see?
 
 # Specify the data file path
-data_file = 'data/12202021/lidar_data_noisy_box_3m.csv'
-f = open(data_file, 'r', newline='')
-reader = csv.reader(f)
+data_file = 'data/12052021/lidar_data_2m.csv'
 
-def plot():
+
+def read_file(file_name):
+        f = open(file_name, 'r', newline='')
+        reader = csv.reader(f)
         dataset = []
         angle = []
         ran = []
@@ -36,20 +31,25 @@ def plot():
                 ran.append(float(row[2]))
                 intensity.append(float(row[3]))
         dataset.append([angle, ran, intensity])
-        print(len(dataset))
 
-        '''
-        fig, ax = plt.subplots(figsize=(10, 6))
-        ax.scatter(x = angle, y = ran)
-        plt.show()
-        '''
+        return dataset
+
+def write_file(dataset, file_name):
+        f = open(file_name, 'w', newline='')
+        fieldnames = ["index", "angle", "range", "intensity"]
+        writer = csv.writer(f)
+        writer.writerow(fieldnames)
+        for index, data in enumerate(dataset):
+                for i in range(len(data[0])):
+                        writer.writerow([index, data[0][i], data[1][i], data[2][i]])
+
+def plot(dataset, num_show = NUM_SHOW):
 
         for i, data in enumerate(dataset):
-                if i >= NUM_SHOW:
+                if i >= num_show:
                         break
                 # fig = plt.figure()
                 # fig.canvas.set_window_title('YDLidar LIDAR Monitor')
-                lidar_polar = plt.subplot(polar=True)
                 lidar_polar = plt.subplot(polar=True)
                 lidar_polar.autoscale_view(True,True,True)
                 lidar_polar.set_rmax(RMAX)
@@ -64,5 +64,6 @@ def plot():
                 # lidar_polar.scatter(angle, ran, alpha=0.95)
                 plt.show()
 
+
 if __name__ == "__main__":
-        plot()
+        plot(read_file(data_file))
