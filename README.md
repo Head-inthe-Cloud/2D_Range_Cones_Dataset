@@ -32,7 +32,8 @@
 - Use `plot.py` to plot results from csv files, don't forget to change change data path
 
 # Dataset
-- Data is collected outdoors with a YDLidar x4
+Data is collected outdoors with a YDLidar x4
+
 Configurations for ./data/12052021:  
 - Range: 2m, 4m, 6m, 8m, 10m
 - Cone Location: The cone should be located at 180 degree angle
