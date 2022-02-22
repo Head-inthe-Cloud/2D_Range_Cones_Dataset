@@ -11,7 +11,7 @@ RMAX = 32.0
 NUM_SHOW = 2   # how many data in the file do you wish to see?
 
 # Specify the data file path
-data_file = 'data/12202021/lidar_data_noisy_box_3m.csv'
+data_file = 'data/12202021/lidar_data_3m.csv'
 f = open(data_file, 'r', newline='')
 reader = csv.reader(f)
 
