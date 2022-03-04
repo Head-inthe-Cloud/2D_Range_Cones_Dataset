@@ -32,6 +32,12 @@
 - Use `plot.py` to plot results from csv files, don't forget to change change data path
 
 # Dataset
-- Data is collected on my roof top with a YDLidar x4
-- Range configurations are 2m, 4m, 6m, 8m, 10m
-- The cone should be located at 180 degree angle
+Data is collected outdoors with a YDLidar x4
+
+Configurations for ./data/12052021:  
+- Range: 2m, 4m, 6m, 8m, 10m
+- Cone Location: The cone should be located at 180 degree angle
+
+Configurations for ./data/12202021:
+- Range: 1m, 2m, 3m, 4m, 4.5m, 6m
+- Cone Location: The cone should be located at 0 degree angle
