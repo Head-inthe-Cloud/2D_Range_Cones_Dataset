@@ -98,7 +98,6 @@ def plot_eval(samples, predictions):
 
 if __name__ == "__main__":
     dataset = extract_from_csv(DATA_FILE, False)
-
     for i in range(NUM_SHOW):
         data = dataset[i]
         print(np.shape(data))
