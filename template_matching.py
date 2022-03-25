@@ -5,11 +5,18 @@ import numpy as np
 from plot import plot_ar, plot_xy, plot_eval
 from datasets import extract_from_csv
 
+
+
+# Input: LocX, LocY, Sigma, Lidar data
+# Output: Highest Pr(location | data)
+
 DATA_FILE = "data/12202021/lidar_data_3m.csv"
 EPSILON = 10e-6
 
 CONE_DIAMETER = 0.23
 POINTS_PER_DEGREE = 3
+
+SIGMA =
 
 # Pr(data) should depend on the state of the vehicle and GPS
 # But for now we are using 1 as its value
@@ -32,7 +39,6 @@ def toxy(point):
 
 def get_distance(point1, point2):
     return pow(pow(point1[0] - point2[0], 2) + pow(point1[1] - point2[1], 2), 0.5)
-
 
 def get_k_nearest_points(points, center, k):
     sorted_points = sorted(points, key=lambda point: get_distance(point, center))
@@ -116,6 +122,9 @@ def evaluate_results(preds, labels):
 def get_prediction_from_point():
     pass
 
+def template_matching(LocX, LocY, Sigma, lidar_data):
+    pass
+
 def main():
     data_points = extract_data_points()
     data_points_xy = toxy(data_points)
@@ -169,7 +178,6 @@ def main():
     cone_labels = np.array([[0.0, 3.0]] * len(predictions))
 
     evaluate_results(predictions, cone_labels)
-
 
 if __name__ == "__main__":
     main()
