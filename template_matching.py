@@ -40,8 +40,8 @@ def get_pr_data_loc(data, samples):
     result = []
     for s_point in samples:
         # get k nearest points
-        visual_angle = 2 * math.tan((CONE_DIAMETER / 2) / s_point[1]) * 180 / math.pi
-        num_ideal_points = int(visual_angle * POINTS_PER_DEGREE)
+        visual_angle = 2 * math.tan((CONE_DIAMETER / 2) / (s_point[1] + EPSILON)) * 180 / math.pi
+        num_ideal_points = max(int(visual_angle * POINTS_PER_DEGREE), 1)
 
         s_point = toxy(s_point)
         nearest_points = get_k_nearest_points(data, s_point, num_ideal_points)
@@ -107,6 +107,7 @@ def evaluate_results(preds, labels):
     distance = [get_distance(preds[idx], labels[idx]) for idx in range(len(preds))]
     mse = mean_squared_error(distance, np.zeros_like(distance))
     print("MSE =", mse)
+    return mse
 
 
 def get_new_sigma(new_center, points, pr_loc_data, sigma, threshold):
@@ -115,14 +116,17 @@ def get_new_sigma(new_center, points, pr_loc_data, sigma, threshold):
     if type(pr_loc_data) is not np.ndarray:
         pr_loc_data = np.array(pr_loc_data)
     possible_points = points[np.where(pr_loc_data > threshold)[0]]
-    distances = np.sort(np.array([get_distance(new_center, point) for point in possible_points]))
-    min_distance = distances[1] # skips the first element, which is the distance to center point itself
-    return min_distance / (3 * sigma)
+    if len(possible_points) <= 1:
+        return sigma
+    else:
+        distances = np.sort(np.array([get_distance(new_center, point) for point in possible_points]))
+        min_distance = distances[1] # skips the first element, which is the distance to center point itself
+        return min_distance / (3 * sigma)
 
 
 # Input: LocX, LocY, Sigma, Lidar data
 # Output: New_LocX, New_LocY, New_Sigma, PrDetect
-def template_matching(LocX, LocY, sigma, lidar_data, eval_mode=False):
+def template_matching(LocX, LocY, sigma, lidar_data, label=None, plot=False):
     # data_points = extract_data_points()
     data_points = lidar_data
     data_points_xy = toxy(data_points)
@@ -142,33 +146,49 @@ def template_matching(LocX, LocY, sigma, lidar_data, eval_mode=False):
     for i in range(n):
         for j in range(n):
             sample_points_xy.append([temp_x + i * sample_gap, temp_y + j * sample_gap])
-
     sample_points = toar(sample_points_xy)
 
     pr_data_loc = np.array(get_pr_data_loc(data_points_xy, sample_points))
     pr_loc = np.array(get_pr_loc(LocX, LocY, sigma, sample_points_xy))
     pr_loc_data = normalize(pr_data_loc * pr_loc / PR_DATA)
     pr_detect = np.amax(pr_loc_data)
-    pred = toxy(sample_points[np.argmax(pr_loc_data)])
+    pred = sample_points_xy[np.argmax(pr_loc_data)]
     new_LocX, new_LocY = pred
 
     new_sigma = get_new_sigma(pred, sample_points_xy, pr_loc_data, sigma, 0.5)
 
-    if eval_mode:
-        print(pred)
-        print(pr_data_loc)
-        data_points.append([0, 0])
-        # plot_eval(sample_points, pr_data_loc)
-        # plot_eval(sample_points, pr_loc)
-        plot_ar(pred, data_points)
-        plot_xy(toxy(pred), data_points_xy, True)
-        plot_eval(sample_points, pr_loc_data)
-        cone_label = [[0.0, 3.0]]
-
-        evaluate_results([pred], cone_label)
+    # If the label is given, enter evaluation mode
+    if label is not None:
+        print("Initial cone center:", center_point_xy, " Predicted cone center: [{:.2f}, {:.2f}]".format(new_LocX, new_LocY))
+        if plot:
+            data_points.append([0, 0])
+            plot_ar(toar(pred), data_points)
+            plot_xy(pred, data_points_xy)
+            plot_eval(sample_points_xy, pr_loc_data)
+        return evaluate_results([pred], [label])
 
     return new_LocX, new_LocY, new_sigma, pr_detect
 
 if __name__ == "__main__":
-    # template_matching(3, 0, 0.35, extract_data_points("data/12202021/lidar_data_3m.csv"), True)
-    template_matching(2.0, 0, 0.35, extract_data_points("data/12202021/lidar_data_noisy_3m_2.csv"))
+    # template_matching(3, 0, 0.35, extract_data_points("data/12202021/data/lidar_data_3m.csv"), [3, 0], True)
+    template_matching(1.6, 0, 0.35, extract_data_points("data/12202021/data/lidar_data_noisy_1m_1.csv"), [1, 0], True)
+
+    # The following code is used for model evaluation
+    # epochs = 10
+    # data_dir = "data/12202021/data"
+    # file_names = os.listdir(data_dir)
+    # total_MSE = 0
+    # for file_name in file_names:
+    #     end_idx = int(file_name.index('m'))
+    #     start_idx = int(file_name.index('_', end_idx - 4, end_idx) + 1)
+    #     distance = float(file_name[start_idx:end_idx])
+    #     label = [distance, 0]
+    #
+    #     file_MSE = 0
+    #     for i in range(epochs):
+    #         distance_guess = distance + np.random.randn()
+    #         file_MSE += template_matching(distance_guess, 0, 0.35, extract_data_points(os.path.join(data_dir, file_name)), label, True)
+    #         print("True distance: ", distance, "Guess: ", distance_guess)
+    #     total_MSE += file_MSE / epochs
+    #
+    # print("Final MSE:", total_MSE / len(file_name))

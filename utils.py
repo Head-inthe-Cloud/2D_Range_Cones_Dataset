@@ -1,13 +1,14 @@
 import numpy as np
 import math
 
+EPSILON = 10e-6
 
 # [x, y] -> [angle, range]
 def toar(point):
     if len(np.shape(point)) == 2:
-        return [[math.tanh(p[1]/p[0]), math.sqrt(pow(p[0], 2) + pow(p[1], 2))] for p in point]
+        return [[np.arctan2(p[1], p[0]), math.sqrt(pow(p[0], 2) + pow(p[1], 2))] for p in point]
     else:
-        return [math.tanh(point[1]/point[0]), math.sqrt(pow(point[0], 2) + pow(point[1], 2))]
+        return [np.arctan2(point[1], point[0]), math.sqrt(pow(point[0], 2) + pow(point[1], 2))]
 
 
 # [angle, range] -> [x, y]
